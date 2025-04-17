@@ -387,7 +387,7 @@ class SQLiteLogging(object):
 
         self.main_widget().set_progress_text(_("Archiving old logs..."))
         self.backup()
-        one_year_ago = int(time.time()) - 356 * DAY
+        one_year_ago = int(time.time()) - 365 * DAY
         # Create archive dir if needed.
         archive_dir = os.path.join(self.config().data_dir, "archive")
         if not os.path.exists(archive_dir):

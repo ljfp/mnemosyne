@@ -20,7 +20,7 @@ class Logger(Component):
         Component.activate(self)
         self._timestamp = None
         self.upload_thread = None
-        self.archive_old_log()
+        self.archive_old_logs()
         self.start_logging()
         if self.config()["upload_science_logs"]:
             from mnemosyne.libmnemosyne.log_uploader import LogUploader
@@ -168,7 +168,7 @@ class Logger(Component):
                 max_log_index = log_index
         return max_log_index
 
-    def archive_old_log(self):
+    def archive_old_logs(self):
 
         """Archive log to history folder if it's large enough."""
 
