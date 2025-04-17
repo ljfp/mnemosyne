@@ -5,10 +5,12 @@
 import os
 import sys
 import shutil
+import pytest
 
 from mnemosyne_test import MnemosyneTest
 from mnemosyne.libmnemosyne import Mnemosyne
 from mnemosyne.libmnemosyne.ui_components.main_widget import MainWidget
+from mnemosyne.libmnemosyne.filters.latex import CheckForUpdatedLatexFiles
 
 answer = None
 
@@ -42,6 +44,11 @@ class TestCloze(MnemosyneTest):
             if isinstance(plugin, ClozePlugin):
                 plugin.activate()
                 break
+
+    def is_latex_available(self):
+        """Check if LaTeX is available on the system."""
+        latex_checker = CheckForUpdatedLatexFiles(self.mnemosyne.component_manager)
+        return latex_checker.is_working()
 
     def test_validate(self):
         card_type = self.card_type_with_id("5")
@@ -393,6 +400,10 @@ third in 2008"""}
         assert "other hint" not in card.question()
 
     def test_latex(self):
+        # Skip test if LaTeX is not available
+        if not self.is_latex_available():
+            pytest.skip("LaTeX not installed or not working")
+            
         card_type = self.card_type_with_id("5")
 
         fact_data = {"text": """<$>[\mathbf{F}]=[q]([\mathbf{E}]+[\mathbf{v}\times\mathbf{B}]</$>"""}
@@ -411,6 +422,10 @@ third in 2008"""}
         assert "<img src" in card.answer()
 
     def test_latex_2(self):
+        # Skip test if LaTeX is not available
+        if not self.is_latex_available():
+            pytest.skip("LaTeX not installed or not working")
+            
         card_type = self.card_type_with_id("5")
 
         fact_data = {"text": """<$>[a]\\left[b\\right]</$>"""}

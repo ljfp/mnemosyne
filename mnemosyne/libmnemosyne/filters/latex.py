@@ -74,9 +74,19 @@ class Latex(Filter):
                 if os.path.exists("tmp.aux"):
                     os.remove("tmp.aux")
                 f = open("tmp.tex", "w", encoding="utf-8")
-                print(self.config()["latex_preamble"], file=f)
+                
+                # Process escaped backslashes in LaTeX commands
+                # Each \\ in Python string becomes a single \ in LaTeX
+                latex_preamble = self.config()["latex_preamble"]
+                latex_postamble = self.config()["latex_postamble"]
+                
+                # Replace literal "\\" with "\" and "\n" with newlines
+                latex_preamble = latex_preamble.replace("\\\\", "\\").replace("\\n", "\n")
+                latex_postamble = latex_postamble.replace("\\\\", "\\").replace("\\n", "\n")
+                
+                print(latex_preamble, file=f)
                 print(latex_command, file=f)
-                print(self.config()["latex_postamble"], file=f)
+                print(latex_postamble, file=f)
                 f.close()
                 in_file = "tmp.tex"
                 self._call_cmd(self.config()["latex"] + [in_file],
