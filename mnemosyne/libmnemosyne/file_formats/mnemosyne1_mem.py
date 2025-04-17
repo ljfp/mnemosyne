@@ -1,4 +1,3 @@
-
 #
 # mnemosyne1_mem.py <Peter.Bienstman@gmail.com>
 #
@@ -54,6 +53,7 @@ class Mnemosyne1Mem(FileFormat, Mnemosyne1):
         timestamp = int(time.time())
         for item in self.items:
             db.log_edited_card(timestamp, item.id)
+        
         # Detect inverses.
         db.link_inverse_cards()
         w.close_progress()

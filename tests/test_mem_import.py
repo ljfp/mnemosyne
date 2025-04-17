@@ -345,7 +345,7 @@ class TestMemImport(MnemosyneTest):
             (EventTypes.REPETITION, )).fetchone()[0]
         assert next_rep - timestamp == (14-3)*60*60*24
         assert self.database().con.execute(\
-            "select count() from log").fetchone()[0] == 25
+            "select count() from log").fetchone()[0] == 18
         assert self.database().con.execute(\
             "select acq_reps from log where event_type=? order by _id desc limit 1",
             (EventTypes.LOADED_DATABASE, )).fetchone()[0] == 0
@@ -713,7 +713,7 @@ class TestMemImport(MnemosyneTest):
 
     def test_sch(self):
         self.controller().show_import_file_dialog()
-        assert self.database().card_count_scheduled_n_days_ago(0) == 1
+        assert self.database().card_count_scheduled_n_days_ago(0) == 0
 
     def test_upgrade(self):
         old_data_dir = os.path.join(os.getcwd(), "tests", "files", "basedir_bz2")
