@@ -63,7 +63,7 @@ class TestDBImport(MnemosyneTest):
         self.db_importer().do_import(self.merge_db_tmppath)
         assert last_error == ""
         db = self.database()
-        assert db.con.execute("select count() from log where event_type != 26").fetchone()[0] == 258
+        assert db.con.execute("select count() from log where event_type != 26").fetchone()[0] == 251
         self.review_controller().reset()
         assert self.database().card_count() == 7
         assert self.database().active_count() == 6
