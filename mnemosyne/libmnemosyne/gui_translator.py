@@ -5,7 +5,8 @@
 
 from mnemosyne.libmnemosyne.component import Component
 
-_ = None
+# Initialize _ to a default identity function to ensure it's never None
+_ = lambda x: x
 
 class GuiTranslator(Component):
 
@@ -59,6 +60,8 @@ class GuiTranslator(Component):
 
         """Used to do translations / mark translatable strings by _("...")."""
 
+        if text is None:
+            return ""
         return self._translator(text)
 
 

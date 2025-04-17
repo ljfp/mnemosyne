@@ -62,13 +62,10 @@ def config_py():
   # Latex preamble. Note that for the pre- and postamble you need to use double
   # slashes instead of single slashes here, to have them escaped when Python
   # reads them in.
-  latex_preamble = r\"\"\"
-  \documentclass[12pt]{article}
-  \pagestyle{empty}
-  \\begin{document}\"\"\"
+  latex_preamble = "\\\\documentclass[12pt]{article}\\n\\\\pagestyle{empty}\\n\\\\begin{document}"
 
   # Latex postamble.
-  latex_postamble = r\"\"\"\end{document}\"\"\"
+  latex_postamble = "\\\\end{document}"
 
   # Latex command.
   latex = "latex -interaction=nonstopmode"
@@ -156,9 +153,8 @@ class Configuration(Component, dict):
              "start_card_browser_sorted": False,
              "day_starts_at": 3,
              "save_after_n_reps": 10,
-             "latex_preamble": "\\documentclass[12pt]{article}\n"+
-                               "\\pagestyle{empty}\n\\begin{document}",
-             "latex_postamble": "\\end{document}",
+             "latex_preamble": "\\\\documentclass[12pt]{article}\\n\\\\pagestyle{empty}\\n\\\\begin{document}",
+             "latex_postamble": "\\\\end{document}",
              "latex": "latex -interaction=nonstopmode",
              "dvipng": "dvipng -D 200 -T tight tmp.dvi",
              "active_plugins": set(), # Plugin class name, not instance.
@@ -481,12 +477,29 @@ class Configuration(Component, dict):
 
         """
         # Use the default OS language settings is possible.
-        # getdefaultlocale is OS independent and works on all platforms.
-        system_language, _ = getdefaultlocale()
+        # Use modern methods as getdefaultlocale is deprecated
+        import locale
+        
+        try:
+            # Try to get current locale settings
+            system_language = locale.getlocale()[0]
+            if not system_language:
+                # Fallback to system's preferred encoding
+                system_language = locale.getpreferredencoding()
+                if not system_language or system_language == 'UTF-8':
+                    system_language = 'en_US'
+        except (ValueError, AttributeError):
+            system_language = 'en_US'
+        
         # if no default locale can be found, default to English
         if system_language is None:
-            system_language = 'en_us'
-        lang_code = system_language.split("_")[0]
+            system_language = 'en_US'
+            
+        if '_' in system_language:
+            lang_code = system_language.split("_")[0]
+        else:
+            # In case we only got a language code without country
+            lang_code = system_language.lower()
 
         # Special case ca@valencia, we only support this specific one.
         if "valencia" in system_language:

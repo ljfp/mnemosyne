@@ -5,7 +5,7 @@
 import os
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 import mnemosyne.version
 from mnemosyne.libmnemosyne.logger import Logger
@@ -18,9 +18,12 @@ class DatabaseLogger(Logger):
     def started_program(self, version_string=None):
         if version_string == None:
             ts = time.time()
-            td = datetime.fromtimestamp(ts) - datetime.utcfromtimestamp(ts)
-            utc_offset = int((td.microseconds + \
-                (td.seconds + td.days * 24. * 3600) * 10**6) / 10**6 / 60 / 60)
+            # Use timezone-aware objects for utc time calculation
+            local_dt = datetime.fromtimestamp(ts)
+            utc_dt = datetime.fromtimestamp(ts, timezone.utc)
+            # Calculate the UTC offset in hours
+            utc_offset = round((local_dt.replace(tzinfo=None) - 
+                               utc_dt.replace(tzinfo=None)).total_seconds() / 3600)
             version_string = "Mnemosyne %s %s %s TZ %s" % \
                 (mnemosyne.version.version, os.name, sys.platform, utc_offset)
         self.database().log_started_program(self.timestamp, version_string)
