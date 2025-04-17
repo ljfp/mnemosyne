@@ -2,6 +2,7 @@
 # configuration.py <Peter.Bienstman@gmail.com>
 #
 
+import locale
 import os
 import re
 import sys
@@ -10,7 +11,7 @@ import sqlite3
 import threading
 import importlib
 import textwrap
-from locale import getdefaultlocale
+from locale import getlocale
 
 from mnemosyne.libmnemosyne.gui_translator import _
 from mnemosyne.libmnemosyne.component import Component
@@ -476,13 +477,12 @@ class Configuration(Component, dict):
         translation for the default OS language return with the default 'en'
 
         """
-        # Use the default OS language settings is possible.
-        # Use modern methods as getdefaultlocale is deprecated
-        import locale
+        # Get the locale from getdefaultlocale
+        locale_tuple = getlocale()
+        system_language = locale_tuple[0] if locale_tuple and locale_tuple[0] else None
         
+        # Rest of the processing follows
         try:
-            # Try to get current locale settings
-            system_language = locale.getlocale()[0]
             if not system_language:
                 # Fallback to system's preferred encoding
                 system_language = locale.getpreferredencoding()
@@ -490,20 +490,20 @@ class Configuration(Component, dict):
                     system_language = 'en_US'
         except (ValueError, AttributeError):
             system_language = 'en_US'
-        
+
         # if no default locale can be found, default to English
         if system_language is None:
             system_language = 'en_US'
-            
+        
+        # Special case ca@valencia, we only support this specific one.
+        if "@valencia" in system_language:
+            return "ca@valencia"
+        
         if '_' in system_language:
             lang_code = system_language.split("_")[0]
         else:
             # In case we only got a language code without country
             lang_code = system_language.lower()
-
-        # Special case ca@valencia, we only support this specific one.
-        if "valencia" in system_language:
-            return "ca@valencia"
 
         # Languages with multiple dialect like zh_CN, zh_TW, zh_HK, pt_BR
         # comes first.
