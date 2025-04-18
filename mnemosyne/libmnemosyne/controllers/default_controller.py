@@ -981,6 +981,11 @@ _("This will tag all the cards in a given card type which have the same question
             # deleting a plugin and then immediately reinstalling it.
             if module_name in sys.modules:
                 del sys.modules[module_name]
+            
+            # Add the plugins directory to the Python path if it's not already there
+            if plugin_dir not in sys.path:
+                sys.path.insert(0, plugin_dir)
+                
             __import__(module_name)
         except Exception as e:
             print(e)
